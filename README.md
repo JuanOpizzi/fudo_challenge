@@ -23,6 +23,6 @@ Para resolver el ejercicio presente se tomaron las siguientes hipotesis:
 
 La solucion propuesta es una del modelo estrella de Kimball. Donde la tabla "Recorridos" es la tabla de hechos y las tablas de "estaciones" y "usuarios" son tablas de dimension.
 
-![image](imgs/diagrama_base_de_datos_v2.png)
+![image](imgs/diagrama_base_de_datos_v3.png)
 
 
