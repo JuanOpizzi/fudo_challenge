@@ -2,7 +2,7 @@
 
 ## Como ejecutar el programa
 
-Se decidio implementar la solucion en un Notebook ejecutado en Google Colab. Simulando la lectura de los datos desde otro sistema (un Google Drive personal). Para poder ejecutar los pasos, lo unico que hay que modificar es reemplazar el path a los archivos, por el path donde decidan colocar los archivos (en google Drive).
+Se decidio implementar la solucion en un Notebook ejecutado en Google Colab `FUDO_challenge.ipynb`. Simulando la lectura de los datos desde otro sistema (un Google Drive personal). Para poder ejecutar los pasos, lo unico que hay que modificar es reemplazar el path a los archivos, por el path donde decidan colocar los archivos (en google Drive).
 
 ## Hipotesis
 
@@ -26,3 +26,62 @@ La solucion propuesta es una del modelo estrella de Kimball. Donde la tabla "Rec
 ![image](imgs/diagrama_base_de_datos_v3.png)
 
 
+<br />
+
+## Puntos extra
+
+
+### Utilizar técnicas de optimización de consultas SQL para mejorar el rendimiento delsistema.
+
+
+Se hizo un analisis del costo de las queries solicitadas por enunciado (1), sin agregar indices secundarios. Y estos fueron los resultados:
+
+#### Relación entre la duración de los viajes y el modelo de bicicleta.
+
+`[(6, 0, 0, 'SCAN recorridos'), (8, 0, 0, 'USE TEMP B-TREE FOR GROUP BY')]`
+
+#### Relación entre la edad de los usuarios y la cantidad de viajes que realizaron.
+
+
+`[(9, 0, 0, 'SCAN re'), (14, 0, 0, 'SEARCH us USING INTEGER PRIMARY KEY (rowid=?)'), (17, 0, 0, 'USE TEMP B-TREE FOR GROUP BY')]`
+
+#### Relación entre la cantidad de viajes realizados y la fecha de alta de los usuarios.
+
+
+`[(8, 0, 0, 'SCAN re'), (10, 0, 0, 'SEARCH us USING INTEGER PRIMARY KEY (rowid=?)'), (13, 0, 0, 'USE TEMP B-TREE FOR GROUP BY')]`
+
+#### Comunas que más viajes reciben
+
+`[(8, 0, 0, 'SCAN re'), (10, 0, 0, 'SEARCH est USING INTEGER PRIMARY KEY (rowid=?)'), (13, 0, 0, 'USE TEMP B-TREE FOR GROUP BY'), (50, 0, 0, 'USE TEMP B-TREE FOR ORDER BY')]`
+
+#### Comunas de las que más viajes parten
+
+`[(8, 0, 0, 'SCAN re'), (12, 0, 0, 'SEARCH est USING INTEGER PRIMARY KEY (rowid=?)'), (15, 0, 0, 'USE TEMP B-TREE FOR GROUP BY'), (52, 0, 0, 'USE TEMP B-TREE FOR ORDER BY')]`
+
+#### Usuarios más activos durante 2023.
+
+`[(8, 0, 0, 'SCAN recorridos'), (10, 0, 0, 'USE TEMP B-TREE FOR GROUP BY'), (51, 0, 0, 'USE TEMP B-TREE FOR ORDER BY')]`
+
+(1) <span style="color:red">NOTA:</span> El analisis se hizo usando la funcion `EXPLAIN QUERY PLAN`. Me hubiera gustado ver las estadisticas de la DB con un SGDB, pero no llegue a hacer esa parte.
+
+#### Indice probados
+
+Se probo agregar los siguientes indices sin lograr ninguna mejora:
+
+- indice secundario por id_estacion_origen en la tabla de recorridos
+- indice secundario por id_estacion_destino en la tabla de recorridos
+- indice secundario por comunas en la tabla de estaciones
+
+Sin embargo si se logro una mejora al usar id_usuario de la tabla recorridos como indice secundario. Mejorando la performance de la query de usuarios mas activos de 2023:
+
+`[(8, 0, 0, 'SCAN recorridos USING COVERING INDEX idx_id_usuario'), (43, 0, 0, 'USE TEMP B-TREE FOR ORDER BY')]`
+
+
+Como se puede apreciar se realizaron menos operaciones para resolver la query. Esto no afecto la performance de las demas queries. Por otro lado, si bien opte por usar este indice, hay que tener en cuenta que el uso de demasiados indices, mejora la lectura pero vuelve mas lenta la lectura de la DB. Que es algo que note probando dichos indices.
+
+
+### Utilizar herramientas de análisis de big data para analizar conjuntos de datos más grandes
+
+Si bien por el volumen de datos se decidio usar Pandas. Es verdad que en primer lugar, Pandas se ejecuta en una sola computadora y mas aun, levanta todo en memoria y contiguo. Por lo que se desarollo una solucion en PySpark (en `FUDO_ejercicio_spark.ipynb`), un framework distribuido para manejar un mayor volumen de datos. (2)
+
+(2) <span style="color:red">NOTA:</span> Por falta de tiempo esta solucion fue implementada a medias. Pero la implementacion es equivalente a la hecha en pandas.
