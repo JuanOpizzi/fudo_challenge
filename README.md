@@ -42,8 +42,6 @@ Otras visualizaciones interesantes que hubiera hecho con tiempo:
 
 - Como varia el flujo de viajes del top 5 de estaciones a lo largo de los meses.
 - Flujo de viajes en cada estacion en un mapa
-- 
-
 
 ## Puntos extra
 
