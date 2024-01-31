@@ -2,7 +2,7 @@
 
 ## Como ejecutar el programa
 
-Se decidio implementar la solucion en un Notebook ejecutado en Google Colab `FUDO_challenge.ipynb`. Simulando la lectura de los datos desde otro sistema (un Google Drive personal). Para poder ejecutar los pasos, lo unico que hay que modificar es reemplazar el path a los archivos, por el path donde decidan colocar los archivos (en google Drive).
+Se decidio implementar la solucion en un Notebook ejecutado en Google Colab `FUDO_challenge.ipynb`. Simulando la lectura de los datos desde otro sistema (un Google Drive personal). Para poder ejecutar los pasos, lo unico que hay que modificar es reemplazar el path a los archivos, por el path donde decidan colocar los archivos (en google Drive). Tambien hay que darle permiso al notebook de los archivos de Google Drive, ejecutando la primer celda. Al finalizar el Notebook se generara una DB en `sqlite3` llamado `ciclistas.db`.
 
 ## Hipotesis
 
@@ -26,7 +26,24 @@ La solucion propuesta es una del modelo estrella de Kimball. Donde la tabla "Rec
 ![image](imgs/diagrama_base_de_datos_v3.png)
 
 
-<br />
+## Visualizacion de datos
+
+
+A continuacion se presenta un grafico de distintas estaciones del centro de BsAs y su caudal de viajes entre ellas (1):
+
+
+![image](imgs/viajes_entre_estaciones.png)
+
+Algo que se puede apreciar es que los viajes donde se vuelve al origen en ciertas estaciones es algo bastante frecuente. Se podria presuponer que muchos usuarios usan las bicis para pasear o hacer ejercicio, siendo mucho menos comunes los viajes en si dado que son lugares con demasiada circulacion de autos para trasladarse en bicicleta.
+
+(1) <span style="color:red">NOTA:</span> Trate de levantar la DB en Metabase on premise, pero tuve demasiados problemas y poco tiempo para conectar metabase a la DB. Por lo que a fin de completar el ejercicio, la visualizacion fue hecha en Python.
+
+Otras visualizaciones interesantes que hubiera hecho con tiempo:
+
+- Como varia el flujo de viajes del top 5 de estaciones a lo largo de los meses.
+- Flujo de viajes en cada estacion en un mapa
+- 
+
 
 ## Puntos extra
 
@@ -34,7 +51,7 @@ La solucion propuesta es una del modelo estrella de Kimball. Donde la tabla "Rec
 ### Utilizar técnicas de optimización de consultas SQL para mejorar el rendimiento delsistema.
 
 
-Se hizo un analisis del costo de las queries solicitadas por enunciado (1), sin agregar indices secundarios. Y estos fueron los resultados:
+Se hizo un analisis del costo de las queries solicitadas por enunciado (2), sin agregar indices secundarios. Y estos fueron los resultados:
 
 #### Relación entre la duración de los viajes y el modelo de bicicleta.
 
@@ -62,7 +79,7 @@ Se hizo un analisis del costo de las queries solicitadas por enunciado (1), sin 
 
 `[(8, 0, 0, 'SCAN recorridos'), (10, 0, 0, 'USE TEMP B-TREE FOR GROUP BY'), (51, 0, 0, 'USE TEMP B-TREE FOR ORDER BY')]`
 
-(1) <span style="color:red">NOTA:</span> El analisis se hizo usando la funcion `EXPLAIN QUERY PLAN`. Me hubiera gustado ver las estadisticas de la DB con un SGDB, pero no llegue a hacer esa parte.
+(2) <span style="color:red">NOTA:</span> El analisis se hizo usando la funcion `EXPLAIN QUERY PLAN`. 
 
 #### Indice probados
 
